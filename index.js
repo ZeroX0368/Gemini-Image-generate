@@ -5,7 +5,7 @@ const express = require('express');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const app = express();
 
-const VALID_API_KEY = process.env.API_KEY || "bucu";
+const VALID_API_KEY = process.env.API_KEY || "dabibanban";
 
 // Middleware to verify API key
 function verifyApiKey(req, res, next) {
@@ -53,29 +53,6 @@ async function generateImage(prompt) {
 
 // Store generated images in memory with unique IDs
 const imageCache = new Map();
-
-app.get('/api/gemini', verifyApiKey, async (req, res) => {
-  try {
-    const prompt = req.query.prompt;
-    
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt parameter is required" });
-    }
-    
-    // Generate text using Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-
-    return res.json({
-      text: response.text()
-    });
-    
-  } catch (error) {
-    console.error("Error generating text:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
 
 app.get('/image', verifyApiKey,async (req, res) => {
   try {
