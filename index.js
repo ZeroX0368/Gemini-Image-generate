@@ -54,6 +54,29 @@ async function generateImage(prompt) {
 // Store generated images in memory with unique IDs
 const imageCache = new Map();
 
+app.get('/api/gemini', verifyApiKey, async (req, res) => {
+  try {
+    const prompt = req.query.prompt;
+    
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt parameter is required" });
+    }
+    
+    // Generate text using Gemini
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+
+    return res.json({
+      text: response.text()
+    });
+    
+  } catch (error) {
+    console.error("Error generating text:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.get('/image', verifyApiKey,async (req, res) => {
   try {
     const prompt = req.query.prompt;
@@ -74,7 +97,6 @@ app.get('/image', verifyApiKey,async (req, res) => {
     const imageUrl = `${req.protocol}://${req.get('host')}/generated/${imageId}.png`;
     
     res.json({
-      message: 'Image generated successfully',
       success: true,
       image: imageUrl,
       prompt: prompt
