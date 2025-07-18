@@ -103,29 +103,6 @@ app.get('/generated/:imageId.png', (req, res) => {
   res.send(imageBuffer);
 });
 
-app.get('/api/ai/gemini', verifyApiKey, async (req, res) => {
-  try {
-    const prompt = req.query.prompt;
-    
-    if (!prompt) {
-      return res.status(400).json({ error: "Prompt parameter is required" });
-    }
-    // Generate text using Gemini
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
-      contents: prompt,
-    });
-
-    return res.json({
-      text: response.text
-    });
-    
-  } catch (error) {
-    console.error("Error generating text:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 app.listen(5000, '0.0.0.0', () => {
   console.log('Server running on port 5000');
 });
