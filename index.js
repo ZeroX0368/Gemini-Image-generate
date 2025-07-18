@@ -29,6 +29,9 @@ async function generateImage(prompt) {
   }
 }
 
+// Store generated images in memory with unique IDs
+const imageCache = new Map();
+
 app.get('/image', async (req, res) => {
   try {
     const prompt = req.query.prompt;
@@ -38,18 +41,44 @@ app.get('/image', async (req, res) => {
     }
 
     const imageData = await generateImage(prompt);
-    const imageBuffer = Buffer.from(imageData, 'base64');
     
-    res.set({
-      'Content-Type': 'image/png',
-      'Content-Length': imageBuffer.length
+    // Generate unique ID for the image
+    const imageId = Date.now() + '-' + Math.random().toString(36).substring(2);
+    
+    // Store image data in cache
+    imageCache.set(imageId, imageData);
+    
+    // Return JSON with image URL
+    const imageUrl = `${req.protocol}://${req.get('host')}/generated/${imageId}.png`;
+    
+    res.json({
+      success: true,
+      image: imageUrl,
+      prompt: prompt
     });
-    
-    res.send(imageBuffer);
     
   } catch (error) {
     res.status(500).json({ error: "Failed to generate image" });
   }
+});
+
+// Endpoint to serve generated images
+app.get('/generated/:imageId.png', (req, res) => {
+  const imageId = req.params.imageId;
+  const imageData = imageCache.get(imageId);
+  
+  if (!imageData) {
+    return res.status(404).json({ error: "Image not found" });
+  }
+  
+  const imageBuffer = Buffer.from(imageData, 'base64');
+  
+  res.set({
+    'Content-Type': 'image/png',
+    'Content-Length': imageBuffer.length
+  });
+  
+  res.send(imageBuffer);
 });
 
 app.listen(5000, '0.0.0.0', () => {
