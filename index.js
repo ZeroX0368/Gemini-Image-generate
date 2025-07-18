@@ -5,6 +5,28 @@ const express = require('express');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const app = express();
 
+const VALID_API_KEY = process.env.API_KEY || "dabibanban";
+
+// Middleware to verify API key
+function verifyApiKey(req, res, next) {
+  const apikey = req.query.apikey || req.headers['x-api-key'];
+  
+  if (!apikey) {
+    return res.status(401).json({
+      error: "API key required for authentication",
+      message: "Provide apikey as query parameter or x-api-key header"
+    });
+  }
+  
+  if (apikey !== VALID_API_KEY) {
+    return res.status(401).json({
+      error: "Invalid or expired api key."
+    });
+  }
+  
+  next();
+}
+
 async function generateImage(prompt) {
   const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash-exp",
@@ -32,7 +54,7 @@ async function generateImage(prompt) {
 // Store generated images in memory with unique IDs
 const imageCache = new Map();
 
-app.get('/image', async (req, res) => {
+app.get('/image', verifyApiKey,async (req, res) => {
   try {
     const prompt = req.query.prompt;
     
