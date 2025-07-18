@@ -5,7 +5,7 @@ const express = require('express');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const app = express();
 
-const VALID_API_KEY = process.env.API_KEY || "dabibanban";
+const VALID_API_KEY = process.env.API_KEY || "bucu";
 
 // Middleware to verify API key
 function verifyApiKey(req, res, next) {
@@ -97,6 +97,7 @@ app.get('/image', verifyApiKey,async (req, res) => {
     const imageUrl = `${req.protocol}://${req.get('host')}/generated/${imageId}.png`;
     
     res.json({
+      message: 'Image generated successfully',
       success: true,
       image: imageUrl,
       prompt: prompt
