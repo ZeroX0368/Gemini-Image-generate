@@ -5,7 +5,7 @@ const express = require('express');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const app = express();
 
-const VALID_API_KEY = process.env.API_KEY || "dabibanban";
+const VALID_API_KEY = process.env.API_KEY || "bucu";
 
 // Middleware to verify API key
 function verifyApiKey(req, res, next) {
