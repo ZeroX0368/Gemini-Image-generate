@@ -74,6 +74,7 @@ app.get('/image', verifyApiKey,async (req, res) => {
     const imageUrl = `${req.protocol}://${req.get('host')}/generated/${imageId}.png`;
     
     res.json({
+      message: 'Image generated successfully',
       success: true,
       image: imageUrl,
       prompt: prompt
